@@ -1,6 +1,14 @@
 import Link from "next/link";
 import type { ProjectFamily } from "@/lib/types";
 import { Arrow, Cover, Tag } from "./ui";
+import Slideshow from "./Slideshow";
+import { projectImages } from "@/lib/projectImages";
+
+function Media({ p, sizes, className }: { p: ProjectFamily; sizes: string; className: string }) {
+  const images = projectImages(p);
+  if (!images.length) return <Cover src="" alt={p.title} label={p.organisation} sizes={sizes} className={className} />;
+  return <Slideshow images={images} sizes={sizes} className={className} />;
+}
 
 function VersionRail({ p }: { p: ProjectFamily }) {
   if (p.versions.length < 2) return null;
@@ -23,13 +31,7 @@ export function FeaturedProject({ p, index }: { p: ProjectFamily; index: number 
       href={`/projects/${p.slug}`}
       className="group grid overflow-hidden rounded-2xl border border-line bg-surface transition hover:border-line-strong md:grid-cols-2"
     >
-      <Cover
-        src={p.cover}
-        alt={p.title}
-        label={p.organisation}
-        sizes="(min-width: 768px) 50vw, 100vw"
-        className={`aspect-[4/3] md:aspect-auto md:min-h-[380px] ${flip ? "md:order-2" : ""}`}
-      />
+      <Media p={p} sizes="(min-width: 768px) 50vw, 100vw" className={`aspect-[4/3] md:aspect-auto md:min-h-[380px] ${flip ? "md:order-2" : ""}`} />
       <div className="flex flex-col gap-5 p-6 md:p-10">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
           <span className="text-accent">{p.category}</span>
@@ -63,7 +65,7 @@ export function FeaturedProject({ p, index }: { p: ProjectFamily; index: number 
 export function ProjectTile({ p }: { p: ProjectFamily }) {
   return (
     <Link href={`/projects/${p.slug}`} className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition hover:-translate-y-0.5 hover:border-line-strong">
-      <Cover src={p.cover} alt={p.title} label={p.organisation} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-[16/10]" />
+      <Media p={p} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-[16/10]" />
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-center justify-between gap-2 font-mono text-[11px] text-muted">
           <span className="text-accent">{p.category}</span>

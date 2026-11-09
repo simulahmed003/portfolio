@@ -78,3 +78,11 @@ body {
   .reveal { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+.progress {
+  animation: progress 4.5s linear forwards;
+}
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
+}

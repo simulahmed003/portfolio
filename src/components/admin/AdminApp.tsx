@@ -10,7 +10,7 @@ const SECTIONS: { id: string; label: string; keys: (keyof SiteContent)[]; help: 
   { id: "hero", label: "Hero and SEO", keys: ["hero", "meta"], help: "Your name, headline, photo and the text search engines show." },
   { id: "stats", label: "Key numbers", keys: ["stats"], help: "The four numbers under the hero." },
   { id: "about", label: "About", keys: ["about"], help: "About text and the four capability cards." },
-  { id: "projects", label: "Projects", keys: ["projectsSection", "projects"], help: "Each project is a family with versions. Open a project, then open a version to edit its text and images." },
+  { id: "projects", label: "Projects", keys: ["projectsSection", "projects"], help: "Add, delete (✕), duplicate (⧉) and reorder (↑↓) projects. ● Live / ○ Hidden shows or pauses a project; ★ makes it a large featured card. Open a project, then open a version to edit its text and images." },
   { id: "experience", label: "Experience", keys: ["experienceSection", "experience"], help: "Jobs and roles, newest first. Use the arrows to reorder." },
   { id: "skills", label: "Skills", keys: ["skills"], help: "Skill groups shown in the Toolkit section." },
   { id: "recognition", label: "Awards and certificates", keys: ["awards", "certifications"], help: "Awards and certificates." },
@@ -149,6 +149,13 @@ export default function AdminApp({ defaults }: { defaults: SiteContent }) {
 
   const save = async () => {
     if (!sb || !data || !session) return;
+    // give new projects a web address from their title automatically
+    const slugify = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+    const fixed = data.projects.map((p, i) => (p.slug.trim() ? p : { ...p, slug: slugify(p.title) || `project-${i + 1}` }));
+    if (fixed.some((p, i) => p !== data.projects[i])) {
+      data.projects = fixed;
+      setData({ ...data });
+    }
     const slugs = data.projects.map((p) => p.slug);
     const bad = slugs.find((s, i) => !/^[a-z0-9-]+$/.test(s) || slugs.indexOf(s) !== i);
     if (bad !== undefined) {

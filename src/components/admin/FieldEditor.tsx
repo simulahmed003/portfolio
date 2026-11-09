@@ -186,10 +186,27 @@ function ArrayEditor({ k, value, onChange, upload, sample }: { k: string; value:
                 <img src={(item as Record<string, Json>).src as string} alt="" className="h-8 w-10 rounded object-cover" />
               ) : null}
               <span className="line-clamp-1">{itemTitle(item, i)}</span>
-              {item && typeof item === "object" && (item as Record<string, Json>).hidden === true && (
-                <span className="rounded bg-surface-2 px-1.5 text-[10px] text-muted">hidden</span>
-              )}
             </button>
+            {item && typeof item === "object" && !Array.isArray(item) && typeof (item as Record<string, Json>).featured === "boolean" && (
+              <button
+                type="button"
+                title="Featured: shown as a large card at the top"
+                onClick={() => set(i, { ...(item as Record<string, Json>), featured: !(item as Record<string, Json>).featured })}
+                className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${(item as Record<string, Json>).featured ? "border-accent/60 text-accent" : "border-line text-muted hover:text-text"}`}
+              >
+                ★ {(item as Record<string, Json>).featured ? "Featured" : "Normal"}
+              </button>
+            )}
+            {item && typeof item === "object" && !Array.isArray(item) && typeof (item as Record<string, Json>).hidden === "boolean" && (
+              <button
+                type="button"
+                title="Live = visible on the website. Hidden = paused, kept here but not shown."
+                onClick={() => set(i, { ...(item as Record<string, Json>), hidden: !(item as Record<string, Json>).hidden })}
+                className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${(item as Record<string, Json>).hidden ? "border-line text-muted" : "border-green/60 text-green"}`}
+              >
+                {(item as Record<string, Json>).hidden ? "○ Hidden" : "● Live"}
+              </button>
+            )}
             <button type="button" className={small} disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move up">↑</button>
             <button type="button" className={small} disabled={i === value.length - 1} onClick={() => move(i, 1)} aria-label="Move down">↓</button>
             <button type="button" className={small} onClick={() => { onChange([...value.slice(0, i + 1), structuredClone(item), ...value.slice(i + 1)]); setOpen(i + 1); }} aria-label="Duplicate">⧉</button>

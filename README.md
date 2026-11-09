@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simul Ahmed — Portfolio
 
-## Getting Started
+Personal portfolio for Simul Ahmed (embedded systems and PCB design). Next.js App Router + Tailwind, content editable from `/admin` through Supabase.
 
-First, run the development server:
+## How content works
+- The whole site is one JSON document (`SiteContent`, see `src/lib/types.ts`).
+- Built-in content lives in `src/content/default.ts`, with images in `public/img`.
+- When Supabase is configured, the site reads the saved copy from table `portfolio_content` (row `id = 'main'`), merged over the defaults, and refreshes within 5 minutes (instantly after saving in admin).
+- Projects are **families**: each has a list of `versions`, each version with its own summary, highlights, specs and images.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Admin panel (`/admin`)
+1. Sign in with the admin email (first time: "Create account", confirm the email, then sign in).
+2. Pick a section, edit text, upload images (resized to 2000 px WebP in the browser), reorder with the arrows, hide items with the Hidden switch.
+3. Press **Save and publish**. "Download backup" exports the JSON.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
+1. Run `supabase/schema.sql` in the Supabase SQL editor (creates the table, the `portfolio-media` bucket and admin-only write policies).
+2. Copy `.env.example` to `.env.local` and fill the values; add the same variables in Vercel.
+3. In Supabase Auth > URL configuration, add the site URL and `https://<site>/admin` as a redirect URL.
+4. `npm install && npm run dev`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+Import the GitHub repo in Vercel (framework: Next.js), add the env variables, deploy.

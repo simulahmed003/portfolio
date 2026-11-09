@@ -1,0 +1,21 @@
+# Second watchdog, independent of Vercel: pings the Supabase database every 2 days
+# so the free-tier project is never paused for inactivity.
+name: Supabase keep-alive
+on:
+  schedule:
+    - cron: "17 4 */2 * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the portfolio table
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://zcvncodkygqzvyfiddip.supabase.co/rest/v1/portfolio_content?select=id&limit=1" \
+            -H "apikey: sb_publishable_knGnGIY_7ugj8I9HyWJWGQ_9xg3kN0Y")
+          echo "Supabase answered HTTP $code"
+          test "$code" = "200"
+      - name: Ping the live site watchdog too
+        continue-on-error: true
+        run: curl -fsS https://simul-ahmed.vercel.app/api/keepalive

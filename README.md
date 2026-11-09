@@ -21,3 +21,9 @@ Personal portfolio for Simul Ahmed (embedded systems and PCB design). Next.js Ap
 
 ## Deploy
 Import the GitHub repo in Vercel (framework: Next.js), add the env variables, deploy.
+
+## Keeping Supabase awake
+Free Supabase projects pause after about a week with no activity. Two watchdogs prevent that:
+- **Vercel Cron** (`vercel.json`) calls `/api/keepalive` every day at 03:00 UTC, which runs a real database query.
+- **GitHub Actions** (`.github/workflows/supabase-keepalive.yml`) queries the database every 2 days, independent of Vercel.
+  GitHub disables scheduled workflows after 60 days without repo activity; re-enable it from the Actions tab if that happens.

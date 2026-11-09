@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Pic from "./Pic";
 import { useEffect, useState } from "react";
 import type { Img } from "@/lib/types";
 
@@ -36,10 +36,10 @@ export default function Slideshow({
         const near = j === i || j === (i + 1) % n || j === 0;
         if (!near) return null;
         return (
-          <Image
+          <Pic
             key={im.src + j}
             src={im.src}
-            alt={im.caption}
+            alt={im.alt || im.caption}
             fill
             sizes={sizes}
             priority={priority && j === 0}

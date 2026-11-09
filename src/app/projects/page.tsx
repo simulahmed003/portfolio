@@ -1,31 +1,24 @@
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { ProjectTile } from "@/components/ProjectCards";
+import ProjectBrowser from "@/components/ProjectBrowser";
 import { SectionHeading } from "@/components/ui";
-import { getContent, visibleProjects } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import { headerProps } from "@/lib/site";
 
-export const metadata: Metadata = { title: "All projects" };
+export async function generateMetadata(): Promise<Metadata> {
+  const c = await getContent();
+  return { title: c.labels.allProjectsTitle, alternates: { canonical: "/projects" } };
+}
 
 export default async function ProjectsPage() {
   const c = await getContent();
-  const list = visibleProjects(c);
-  const cats = Array.from(new Set(list.map((p) => p.category)));
   return (
     <>
-      <SiteHeader name={c.hero.name} cvUrl={c.contact.cvUrl} />
+      <SiteHeader {...headerProps(c)} />
       <main className="mx-auto max-w-6xl px-5 pb-24 pt-32">
-        <SectionHeading eyebrow="Projects" title="All projects" intro={c.projectsSection.intro} />
-        {cats.map((cat) => (
-          <section key={cat} className="mb-14">
-            <h2 className="mb-5 border-b border-line pb-3 font-mono text-xs uppercase tracking-wider text-accent">{cat}</h2>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {list.filter((p) => p.category === cat).map((p) => (
-                <ProjectTile key={p.slug} p={p} />
-              ))}
-            </div>
-          </section>
-        ))}
+        <SectionHeading as="h1" eyebrow={c.projectsSection.eyebrow} title={c.labels.allProjectsTitle} intro={c.projectsSection.intro} />
+        <ProjectBrowser projects={c.projects} labels={c.labels} />
       </main>
       <SiteFooter c={c} />
     </>

@@ -1,16 +1,32 @@
-import type { SiteContent } from "@/lib/types";
+import type { DeepPartial, SiteContent } from "@/lib/types";
+import { normalizeContent } from "@/lib/normalize";
 
 // Starting content, written from Simul's CV (10 Sep 2026), LinkedIn, GitHub and project folders.
-// Everything here can be changed from /admin once Supabase is connected.
+// Everything here can be changed from /admin. This file is only the starting point and the fallback
+// when the database is unreachable; it is passed through normalizeContent so every field exists.
 
-const img = (src: string, caption: string) => ({ src: `/img/${src}.webp`, caption });
+const img = (src: string, caption: string) => ({ src: `/img/${src}.webp`, caption, alt: "" });
 
-export const defaultContent: SiteContent = {
+const raw: DeepPartial<SiteContent> = {
   meta: {
     siteTitle: "Simul Ahmed | Embedded Systems & PCB Design",
     description:
       "Embedded systems engineer and full-cycle PCB designer. Commercial hardware with 2,000+ units in the field, smart medical devices, and robotics research.",
+    ogImage: "",
+    favicon: "",
+    logo: "",
   },
+  theme: { accent: "#e3a061" },
+  layout: [
+    { id: "stats", show: true, nav: "" },
+    { id: "about", show: true, nav: "" },
+    { id: "work", show: true, nav: "Work" },
+    { id: "experience", show: true, nav: "Experience" },
+    { id: "recognition", show: true, nav: "Recognition" },
+    { id: "skills", show: true, nav: "" },
+    { id: "leadership", show: true, nav: "Leadership" },
+    { id: "contact", show: true, nav: "Contact" },
+  ],
   hero: {
     eyebrow: "Embedded Systems Engineer · PCB Designer",
     name: "Simul Ahmed",
@@ -30,6 +46,7 @@ export const defaultContent: SiteContent = {
     { value: "Top 10", label: "VLSITHON 3.0 national chip-design finale" },
   ],
   about: {
+    eyebrow: "About",
     heading: "Hardware that survives contact with the real world",
     paragraphs: [
       "I study Energy Science and Engineering at KUET and have spent the last three years building hardware for companies, clients and research labs. My core is PCB design in Altium, KiCad and EasyEDA, backed by firmware on STM32, ESP32 and AVR, enclosure design in SolidWorks, and hands-on fabrication with CNC milling, etching and 3D printing.",
@@ -55,7 +72,11 @@ export const defaultContent: SiteContent = {
     ],
   },
   projectsSection: {
+    eyebrow: "Projects",
     heading: "Selected work",
+    moreHeading: "More projects",
+    allLabel: "All projects",
+    homeLimit: 6,
     intro:
       "Each project is grouped as a family, with every version kept in order. Open any card to see the full version history, photos and specs.",
   },
@@ -235,14 +256,12 @@ export const defaultContent: SiteContent = {
         { value: "56.1%", label: "model fit, 2nd-order discrete TF" },
         { value: "<5%", label: "overshoot on hardware" },
       ],
-      links: [
-        { label: "v1 on GitHub", url: "https://github.com/simulahmed003/Line-Follower" },
-        { label: "v2 design on GitHub", url: "https://github.com/simulahmed003/Line-Follower-Design-v2.0" },
-        {
-          label: "System ID + PID research",
-          url: "https://github.com/simulahmed003/System-Identification-and-PID-Control-Implementation-on-LFR",
-        },
+      repos: [
+        { url: "https://github.com/simulahmed003/System-Identification-and-PID-Control-Implementation-on-LFR", name: "LFR system identification and PID", note: "System identification, PID tuning code and the full report" },
+        { url: "https://github.com/simulahmed003/Line-Follower-Design-v2.0", name: "Line follower v2 design", note: "v2: PCB design, code and build guides" },
+        { url: "https://github.com/simulahmed003/Line-Follower", name: "Line follower v1", note: "v1: STM32 robot, PCB design files and photos" },
       ],
+      links: [],
       versions: [
         {
           label: "v0",
@@ -436,7 +455,8 @@ export const defaultContent: SiteContent = {
       featured: false,
       hidden: false,
       metrics: [{ value: "2", label: "versions" }],
-      links: [{ label: "GitHub", url: "https://github.com/simulahmed003/IOT-Water-Temp-Controller" }],
+      repos: [{ url: "https://github.com/simulahmed003/IOT-Water-Temp-Controller", name: "", note: "Both Altium PCB versions and photos" }],
+      links: [],
       versions: [
         {
           label: "v1",
@@ -478,7 +498,8 @@ export const defaultContent: SiteContent = {
         { value: "125", label: "LEDs" },
         { value: "4.4k", label: "LinkedIn impressions" },
       ],
-      links: [{ label: "GitHub", url: "https://github.com/simulahmed003/5x5x5-LED-Cube" }],
+      repos: [{ url: "https://github.com/simulahmed003/5x5x5-LED-Cube", name: "", note: "Altium schematic, PCB and photos" }],
+      links: [],
       versions: [
         {
           label: "v1",
@@ -516,7 +537,8 @@ export const defaultContent: SiteContent = {
         { value: "0.15 mm", label: "trace / clearance milled" },
         { value: "2", label: "restoration phases" },
       ],
-      links: [{ label: "grbl-custom on GitHub", url: "https://github.com/simulahmed003/grbl-custom" }],
+      repos: [{ url: "https://github.com/simulahmed003/grbl-custom", name: "", note: "Customised GRBL for the new controller" }],
+      links: [],
       versions: [
         {
           label: "Phase 1",
@@ -628,10 +650,11 @@ export const defaultContent: SiteContent = {
       featured: false,
       hidden: false,
       metrics: [],
-      links: [
-        { label: "Anemometer logger", url: "https://github.com/simulahmed003/Datalogger-Cup-Anemometer" },
-        { label: "Turbine logger", url: "https://github.com/simulahmed003/WindTurbine-Datalogger" },
+      repos: [
+        { url: "https://github.com/simulahmed003/Datalogger-Cup-Anemometer", name: "Cup anemometer data logger", note: "Wind and weather logger: anemometer, DHT, SD card" },
+        { url: "https://github.com/simulahmed003/WindTurbine-Datalogger", name: "Wind turbine data logger", note: "Turbine power logger with Bluetooth" },
       ],
+      links: [],
       versions: [
         {
           label: "Logger A",
@@ -670,7 +693,8 @@ export const defaultContent: SiteContent = {
       featured: false,
       hidden: false,
       metrics: [],
-      links: [{ label: "GitHub", url: "https://github.com/simulahmed003/BCD-Clock" }],
+      repos: [{ url: "https://github.com/simulahmed003/BCD-Clock", name: "", note: "Altium design files and report" }],
+      links: [],
       versions: [
         {
           label: "v1",
@@ -721,6 +745,7 @@ export const defaultContent: SiteContent = {
     },
   ],
   experienceSection: {
+    eyebrow: "Career",
     heading: "Experience",
     intro: "Industry roles, contracts and the communities I lead.",
   },
@@ -729,6 +754,7 @@ export const defaultContent: SiteContent = {
       organisation: "Caretron",
       role: "Embedded System Engineer",
       period: "Aug 2025 – Present",
+      current: true,
       location: "Banani, Dhaka · Hybrid",
       type: "Health-tech startup",
       summary: "Hardware for Caretron's smart medicine dispenser: PCB in Altium, enclosure and injection-mold design in SolidWorks, STM32 firmware.",
@@ -766,6 +792,7 @@ export const defaultContent: SiteContent = {
       organisation: "FabLab KUET",
       role: "Student Operator",
       period: "Jul 2026 – Present",
+      current: true,
       location: "Khulna, Bangladesh",
       type: "Part-time",
       summary: "Lab operations, equipment maintenance and student project support; runs PCB design and fabrication workshops.",
@@ -776,6 +803,7 @@ export const defaultContent: SiteContent = {
       organisation: "EasyEDA",
       role: "Official Campus Ambassador",
       period: "Jul 2026 – Present",
+      current: true,
       location: "KUET",
       type: "Part-time",
       summary: "Represents EasyEDA at KUET; runs beginner PCB workshops and the EasyEDA training camp.",
@@ -786,6 +814,7 @@ export const defaultContent: SiteContent = {
       organisation: "Embedded Innovators KUET",
       role: "Founder & Team Lead",
       period: "Mar 2025 – Present",
+      current: true,
       location: "KUET",
       type: "Leadership",
       summary: "Founded a student group that trains junior batches in Altium, FlatCAM and G-code-based PCB fabrication.",
@@ -796,6 +825,7 @@ export const defaultContent: SiteContent = {
       organisation: "Ami-e Biggani",
       role: "Instructor",
       period: "Jan 2026 – Present",
+      current: true,
       location: "Mohammadpur, Dhaka",
       type: "Part-time",
       summary: "STEM and robotics classes for school students.",
@@ -823,6 +853,7 @@ export const defaultContent: SiteContent = {
       hidden: false,
     },
   ],
+  skillsSection: { eyebrow: "Toolkit", heading: "Skills and tools", intro: "" },
   skills: [
     { group: "PCB design", items: ["Altium Designer (certified)", "KiCad", "EasyEDA", "Multi-board assemblies", "Mixed-signal & isolated layouts", "DFM / fab outputs"] },
     { group: "Embedded", items: ["STM32", "ESP32 / ESP01", "ATmega / Arduino", "AT89S52", "MQTT", "Bluetooth"] },
@@ -832,6 +863,13 @@ export const defaultContent: SiteContent = {
     { group: "Programming", items: ["C / C++", "Python", "MATLAB", "TypeScript"] },
     { group: "Growing", items: ["VLSI physical design", "Cadence Innovus", "Static timing"] },
   ],
+  recognitionSection: {
+    eyebrow: "Recognition",
+    heading: "Awards and certificates",
+    intro: "Competition results, industrial attachments and professional certifications. Tap a certificate to see it in full.",
+    certificatesHeading: "Certificates",
+    homeLimit: 6,
+  },
   awards: [
     {
       title: "2nd Place, International",
@@ -855,16 +893,53 @@ export const defaultContent: SiteContent = {
       image: "",
     },
   ],
-  certifications: [
+  certificates: [
     {
-      name: "Altium Designer Essentials (Accredited)",
+      title: "Altium Designer Essentials (Accredited)",
       issuer: "Altium",
       date: "Jul 2026",
-      credential: "bgxkfw5e1p",
+      kind: "Professional",
+      detail: "Accredited certification covering schematic capture, PCB layout and manufacturing outputs in Altium Designer.",
       image: "/img/act/altium-badge.webp",
+      credentialId: "bgxkfw5e1p",
+      featured: true,
     },
-    { name: "Industrial Attachment: PCB Fabrication", issuer: "SARBS Communication Ltd.", date: "Nov 2024", credential: "", image: "" },
-    { name: "Industrial Attachment: Power Plant Operations", issuer: "Orion Power Rupsha Ltd.", date: "Dec 2025", credential: "", image: "" },
+    {
+      title: "Mars Autonomous Rover Rally: Certificate of Successful Completion",
+      issuer: "Texas A&M Aerospace Engineering · Texas Space Grant Consortium",
+      date: "Dec 2025",
+      kind: "Participation",
+      detail: "Undergraduate team member, Team Durbar (KUET), in the international Mars Autonomous Rover Rally design competition.",
+      image: "/img/certs/mars-rover-rally.webp",
+      featured: true,
+    },
+    {
+      title: "Industrial Attachment: Operation Department",
+      issuer: "Orion Power Rupsha Ltd.",
+      date: "Dec 2025",
+      kind: "Industrial attachment",
+      detail: "One-week attachment with the power plant's Operation Department, 28 Nov to 4 Dec 2025.",
+      image: "/img/certs/orion-power-attachment.webp",
+      featured: true,
+    },
+    {
+      title: "Industrial Attachment: PCB Fabrication",
+      issuer: "SARBS Communications Ltd.",
+      date: "Nov 2024",
+      kind: "Industrial attachment",
+      detail: "PCB fabrication with CNC milling and chemical etching, 14 to 17 Oct 2024. Contributed to a temperature-controlled fan system and a 3.3 V regulator circuit.",
+      image: "/img/certs/sarbs-attachment.webp",
+      featured: true,
+    },
+    {
+      title: "Certificate of Appreciation: Bronze Award",
+      issuer: "DREAM, Voluntary Blood Donation Society of KUET",
+      date: "",
+      kind: "Appreciation",
+      detail: "For donating blood voluntarily more than three times during university life.",
+      image: "/img/certs/kuet-blood-donation.webp",
+      featured: false,
+    },
   ],
   education: [
     {
@@ -876,7 +951,9 @@ export const defaultContent: SiteContent = {
     { school: "Police Lines School and College, Kushtia", degree: "HSC, Science", period: "2019 – 2022", detail: "" },
   ],
   activitiesSection: {
+    eyebrow: "Community",
     heading: "Leadership and teaching",
+    educationHeading: "Education",
     intro: "I teach what I build. Workshops, student communities and competitions.",
   },
   activities: [
@@ -924,13 +1001,55 @@ export const defaultContent: SiteContent = {
     },
   ],
   contact: {
+    eyebrow: "Contact",
     heading: "Let's build something that ships",
     text: "I'm interested in embedded hardware, PCB design and product engineering roles, and in research collaborations on embedded and VLSI systems.",
     email: "simulahmed003@gmail.com",
     phone: "",
-    linkedin: "https://www.linkedin.com/in/simulahmed003",
-    github: "https://github.com/simulahmed003",
     location: "Khulna, Bangladesh",
     cvUrl: "",
+    links: [
+      { label: "LinkedIn", url: "https://www.linkedin.com/in/simulahmed003" },
+      { label: "GitHub", url: "https://github.com/simulahmed003" },
+    ],
+  },
+  footer: { text: "\u00a9 {year} {name}. Designed and built in Khulna.", showLinks: true },
+  labels: {
+    menu: "Menu",
+    downloadCv: "Download CV",
+    allWork: "All work",
+    role: "Role",
+    links: "Links",
+    versionHistory: "Version history",
+    noImages: "Images coming soon",
+    nextProject: "Next project",
+    exploreVersions: "Explore {n} versions",
+    viewProject: "View project",
+    versionsCount: "{n} versions",
+    photosCount: "{n} photos",
+    allProjectsTitle: "All projects",
+    filterAll: "All",
+    searchProjects: "Search projects",
+    noResults: "No projects match your search.",
+    certificatesTitle: "Certificates and awards",
+    certificatesIntro: "Every certificate, attachment and award in one place. Tap any certificate to view it in full.",
+    awardsHeading: "Awards",
+    viewAllCertificates: "View all {n} certificates",
+    viewCertificate: "View certificate",
+    verify: "Verify",
+    openPdf: "Open PDF",
+    credentialId: "Credential ID",
+    close: "Close",
+    previous: "Previous",
+    next: "Next",
+    notFoundTitle: "Page not found",
+    notFoundText: "The page you are looking for has moved or no longer exists.",
+    backHome: "Back to home",
+    sourceCode: "Source code",
+    codeOnGithub: "Code on GitHub",
+    copyLink: "Copy link",
+    linkCopied: "Link copied",
   },
 };
+
+export const defaultContent: SiteContent = normalizeContent(raw);

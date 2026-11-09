@@ -1,13 +1,29 @@
 import Link from "next/link";
-import type { ProjectFamily } from "@/lib/types";
-import { Arrow, Cover, Tag } from "./ui";
+import type { Labels, ProjectFamily } from "@/lib/types";
+import { fill } from "@/lib/text";
+import { Arrow, Cover, GithubIcon, Tag } from "./ui";
 import Slideshow from "./Slideshow";
 import { projectImages } from "@/lib/projectImages";
 
-function Media({ p, sizes, className }: { p: ProjectFamily; sizes: string; className: string }) {
+function Media({ p, sizes, className, priority }: { p: ProjectFamily; sizes: string; className: string; priority?: boolean }) {
   const images = projectImages(p);
-  if (!images.length) return <Cover src="" alt={p.title} label={p.organisation} sizes={sizes} className={className} />;
-  return <Slideshow images={images} sizes={sizes} className={className} />;
+  if (!images.length) return <Cover src="" alt={p.title} label={p.organisation || p.title} sizes={sizes} className={className} />;
+  return <Slideshow images={images} sizes={sizes} className={className} priority={priority} />;
+}
+
+function Meta({ p, className = "" }: { p: ProjectFamily; className?: string }) {
+  const parts = [p.organisation, p.period].filter(Boolean);
+  return (
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted ${className}`}>
+      {p.category && <span className="text-accent">{p.category}</span>}
+      {parts.map((x, i) => (
+        <span key={i} className="flex items-center gap-3">
+          {(p.category || i > 0) && <span aria-hidden>·</span>}
+          <span>{x}</span>
+        </span>
+      ))}
+    </div>
+  );
 }
 
 function VersionRail({ p }: { p: ProjectFamily }) {
@@ -16,7 +32,7 @@ function VersionRail({ p }: { p: ProjectFamily }) {
     <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
       {p.versions.map((v, i) => (
         <span key={i} className="flex items-center gap-1.5">
-          <span className={`rounded border px-1.5 py-0.5 ${i === p.versions.length - 1 ? "border-accent/50 text-accent" : "border-line text-muted"}`}>{v.label}</span>
+          <span className={`rounded border px-1.5 py-0.5 ${i === p.versions.length - 1 ? "border-accent/50 text-accent" : "border-line text-muted"}`}>{v.label || i + 1}</span>
           {i < p.versions.length - 1 && <span className="text-line-strong">→</span>}
         </span>
       ))}
@@ -24,24 +40,18 @@ function VersionRail({ p }: { p: ProjectFamily }) {
   );
 }
 
-export function FeaturedProject({ p, index }: { p: ProjectFamily; index: number }) {
+export function FeaturedProject({ p, index, labels }: { p: ProjectFamily; index: number; labels: Labels }) {
   const flip = index % 2 === 1;
   return (
     <Link
       href={`/projects/${p.slug}`}
       className="group grid overflow-hidden rounded-2xl border border-line bg-surface transition hover:border-line-strong md:grid-cols-2"
     >
-      <Media p={p} sizes="(min-width: 768px) 50vw, 100vw" className={`aspect-[4/3] md:aspect-auto md:min-h-[380px] ${flip ? "md:order-2" : ""}`} />
+      <Media p={p} priority={index === 0} sizes="(min-width: 768px) 50vw, 100vw" className={`aspect-[4/3] md:aspect-auto md:min-h-[380px] ${flip ? "md:order-2" : ""}`} />
       <div className="flex flex-col gap-5 p-6 md:p-10">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
-          <span className="text-accent">{p.category}</span>
-          <span>·</span>
-          <span>{p.organisation}</span>
-          <span>·</span>
-          <span>{p.period}</span>
-        </div>
+        <Meta p={p} />
         <h3 className="text-2xl font-semibold tracking-tight text-balance md:text-[1.7rem]">{p.title}</h3>
-        <p className="leading-relaxed text-muted text-pretty">{p.tagline}</p>
+        {p.tagline && <p className="leading-relaxed text-muted text-pretty">{p.tagline}</p>}
         {p.metrics.length > 0 && (
           <dl className="grid grid-cols-3 gap-4 border-y border-line py-4">
             {p.metrics.slice(0, 3).map((m, i) => (
@@ -53,16 +63,23 @@ export function FeaturedProject({ p, index }: { p: ProjectFamily; index: number 
           </dl>
         )}
         <VersionRail p={p} />
-        <span className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-text">
-          {p.versions.length > 1 ? `Explore ${p.versions.length} versions` : "View project"}
-          <Arrow className="transition group-hover:translate-x-1" />
-        </span>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-text">
+            {p.versions.length > 1 ? fill(labels.exploreVersions, { n: p.versions.length }) : labels.viewProject}
+            <Arrow className="transition group-hover:translate-x-1" />
+          </span>
+          {p.repos.some((r) => r.url) && labels.codeOnGithub && (
+            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted">
+              <GithubIcon className="h-3.5 w-3.5" /> {labels.codeOnGithub}
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );
 }
 
-export function ProjectTile({ p }: { p: ProjectFamily }) {
+export function ProjectTile({ p, labels }: { p: ProjectFamily; labels: Labels }) {
   return (
     <Link href={`/projects/${p.slug}`} className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition hover:-translate-y-0.5 hover:border-line-strong">
       <Media p={p} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="aspect-[16/10]" />
@@ -72,9 +89,14 @@ export function ProjectTile({ p }: { p: ProjectFamily }) {
           <span>{p.period}</span>
         </div>
         <h3 className="font-semibold tracking-tight text-balance">{p.title}</h3>
-        <p className="text-sm leading-relaxed text-muted text-pretty">{p.tagline}</p>
+        {p.tagline && <p className="text-sm leading-relaxed text-muted text-pretty">{p.tagline}</p>}
         <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-          {p.versions.length > 1 && <Tag>{p.versions.length} versions</Tag>}
+          {p.versions.length > 1 && <Tag>{fill(labels.versionsCount, { n: p.versions.length })}</Tag>}
+          {p.repos.some((r) => r.url) && labels.codeOnGithub && (
+            <Tag>
+              <GithubIcon className="h-3 w-3" /> {labels.codeOnGithub}
+            </Tag>
+          )}
           {p.tags.slice(0, 2).map((t) => (
             <Tag key={t}>{t}</Tag>
           ))}

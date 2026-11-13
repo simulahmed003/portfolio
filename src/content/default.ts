@@ -822,7 +822,7 @@ const raw: DeepPartial<SiteContent> = {
       hidden: false,
     },
     {
-      organisation: "Ami-e Biggani",
+      organisation: "Next Node Solutions",
       role: "Instructor",
       period: "Jan 2026 – Present",
       current: true,

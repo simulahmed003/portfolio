@@ -37,7 +37,7 @@ const raw: DeepPartial<SiteContent> = {
     location: "Khulna, Bangladesh",
     availability: "Open to embedded hardware and PCB design roles",
     primaryCta: { label: "View selected work", url: "#work" },
-    secondaryCta: { label: "Get in touch", url: "#contact" },
+    secondaryCta: { label: "Download CV", url: "/cv/Simul_Ahmed_CV.pdf" },
   },
   stats: [
     { value: "2,000+", label: "Commercial units deployed with my hardware" },

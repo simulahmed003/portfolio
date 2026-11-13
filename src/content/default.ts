@@ -1014,7 +1014,7 @@ const raw: DeepPartial<SiteContent> = {
     email: "simulahmed003@gmail.com",
     phone: "",
     location: "Khulna, Bangladesh",
-    cvUrl: "",
+    cvUrl: "/cv/Simul_Ahmed_CV.pdf",
     links: [
       { label: "LinkedIn", url: "https://www.linkedin.com/in/simulahmed003" },
       { label: "GitHub", url: "https://github.com/simulahmed003" },
